@@ -90,6 +90,10 @@ class Scale
   #
   # @return [Numeric, nil]
   def factor
+    # REVIEW: Scale factor can have some floating point precision noise from
+    # unit conversion. Perhaps it should be detected if string contains unit
+    # information when parsing, and no length conversion be made when not?
+    #  Scale.new("30%").facto => 0.30000000000000004
     @factor if valid?
   end
 
