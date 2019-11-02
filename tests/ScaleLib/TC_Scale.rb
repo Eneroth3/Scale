@@ -61,13 +61,13 @@ class TC_Scale < TestUp::TestCase
     scale1 = Scale.new("30%")
     scale2 = scale1.floor
     assert_in_delta(scale1.factor, 0.3, SKETCHUP_FLOAT_TOLERANCE, "Original scale should not mutate")
-    assert_equal(scale2.factor, 0.5)
+    assert_equal(scale2.factor, 0.2)
   end
 
   def test_floor_Bang
     scale1 = Scale.new("30%")
     scale2 = scale1.floor!
     assert_same(scale1, scale2)
-    assert_equal(scale2.factor, 0.5)
+    assert_equal(scale2.factor, 0.2)
   end
 end
