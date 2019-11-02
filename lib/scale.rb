@@ -9,7 +9,7 @@ class Scale
   # Multiples of 10^N used in common and less common scales.
   # The more unorthodox scales, such as 1:30 and 1:800, can be used to fit
   # a drawing better into a layout e.g. in a portfolio.
-  EXTENDED_SCALE_FACTORS = [1, 3, 4, 5, 8, 10].freeze
+  EXTENDED_SCALE_FACTORS = [1, 1.5, 2, 3, 4, 5, 8, 10].freeze
 
   # Get source string scale was created from, or nil if it was created
   # from a number.
