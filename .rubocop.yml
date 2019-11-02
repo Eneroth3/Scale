@@ -4,6 +4,8 @@ AllCops:
   DisplayCopNames: true
   SketchUp:
     TargetSketchUpVersion: 2017
+  Exclude:
+    - 'tests/**/*'
 
 Metrics/AbcSize:
   Enabled: false
