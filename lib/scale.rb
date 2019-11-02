@@ -158,6 +158,12 @@ class Scale
     # Scale can no longer be considered to be generated from string.
     @source_string = nil
 
+    # If the scale factor is smaller than 1, round its inverse to an sensible
+    # number. In 1:x, x should be the sensible value, not its inverse.
+    downsize = @factor < 1
+    @factor = 1 / @factor if downsize
+    direction = -direction if downsize
+
     coefficient, exponent = split_number(@factor)
     coefficient = round_to_target(coefficient, target, direction)
 
@@ -165,6 +171,8 @@ class Scale
     # Ensure result is float to honor API contract and avoid unexpected
     # consequence elsewhere.
     @factor = (coefficient * 10**exponent).to_f
+
+    @factor = 1 / @factor if downsize
 
     self
   end
