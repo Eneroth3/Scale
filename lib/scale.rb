@@ -2,6 +2,15 @@
 class Scale
   include Comparable
 
+  # Multiples of 10^N used in common scales.
+  # Typical scales used for drawings are 1:1, 1:2, 1:5, 1:10, 1:20, 1:50 etc.
+  COMMON_SCALE_FACTORS = [1, 2, 5, 10].freeze
+
+  # Multiples of 10^N used in common and less common scales.
+  # The more unorthodox scales, such as 1:30 and 1:800, can be used to fit
+  # a drawing better into a layout e.g. in a portfolio.
+  EXTENDED_SCALE_FACTORS = [1, 3, 4, 5, 8, 10].freeze
+
   # Get source string scale was created from, or nil if it was created
   # from a number.
   #
@@ -42,6 +51,32 @@ class Scale
     @factor <=> other.factor
   end
 
+  # Create a copy rounded upwards, for a larger drawing.
+  #
+  # If a scale has been calculated to exactly fit a drawing into a drawing area,
+  # this can be used to give the drawing a more reasonable scale while still
+  # filling up the full drawing area.
+  #
+  # @param target [Array<Numeric>] Multiples of 10^N to round to.
+  #
+  # @return [Scale]
+  def ceil(target: COMMON_SCALE_FACTORS)
+    dup.ceil!(target: target)
+  end
+
+  # Round scale upwards, for a larger drawing.
+  #
+  # If a scale has been calculated to exactly fit a drawing into a drawing area,
+  # this can be used to give the drawing a more reasonable scale while still
+  # filling up the full drawing area.
+  #
+  # @param target [Array<Numeric>] Multiples of 10^N to round to.
+  #
+  # @return [Scale]
+  def ceil!(target: COMMON_SCALE_FACTORS)
+    round!(target: target, direction: 1)
+  end
+
   # Get developer friendly string representation of Scale.
   #
   # @return [String]
@@ -58,6 +93,32 @@ class Scale
     @factor if valid?
   end
 
+  # Create a copy rounded downwards, for a smaller drawing.
+  #
+  # If a scale has been calculated to exactly fit a drawing into a drawing area,
+  # this can be used to give the drawing a more reasonable scale while still
+  # being contained within the drawing area.
+  #
+  # @param target [Array<Numeric>] Multiples of 10^N to round to.
+  #
+  # @return [Scale]
+  def floor(target: COMMON_SCALE_FACTORS)
+    dup.floor!(target: target)
+  end
+
+  # Round scale downwards, for a smaller drawing.
+  #
+  # If a scale has been calculated to exactly fit a drawing into a drawing area,
+  # this can be used to give the drawing a more reasonable scale while still
+  # being contained within the drawing area.
+  #
+  # @param target [Array<Numeric>] Multiples of 10^N to round to.
+  #
+  # @return [Scale]
+  def floor!(target: COMMON_SCALE_FACTORS)
+    round!(target: target, direction: -1)
+  end
+
   # Format human readable string based on scale factor, e.g. "1:100" or "~1:42".
   #
   # @return [String]
@@ -71,6 +132,37 @@ class Scale
     string = "~#{string}" unless self == self.class.new(string)
 
     string
+  end
+
+  # Create a copy rounded to a commonly used scale.
+  #
+  # @param target [Array<Numeric>] Multiples of 10^N to round to.
+  # @param direction [-1, 0, 1] Round down, to closest or up.
+  #
+  # @return [Scale]
+  def round(target: COMMON_SCALE_FACTORS, direction: 0)
+    dup.round!(target: target, direction: direction)
+  end
+
+  # Round to a commonly used scale.
+  #
+  # @param target [Array<Numeric>] Multiples of 10^N to round to.
+  # @param direction [-1, 0, 1] Round down, to closest or up.
+  #
+  # @return [Scale]
+  def round!(target: COMMON_SCALE_FACTORS, direction: 0)
+    # Scale can no longer be considered to be generated from string.
+    @source_string = nil
+
+    coefficient, exponent = split_number(@factor)
+    coefficient = round_to_target(coefficient, target, direction)
+
+    # Sometimes Rational is included and overrides Ruby core math functionality.
+    # Ensure result is float to honor API contract and avoid unexpected
+    # consequence elsewhere.
+    @factor = (coefficient * 10**exponent).to_f
+
+    self
   end
 
   # Get string representation of Scale. If Scale was created from string the
@@ -114,5 +206,29 @@ class Scale
     string.strip.sub("%", "").to_l / (string.end_with?("%") ? 100 : 1)
   rescue ArgumentError
     nil
+  end
+
+  # Split number into coefficient and power of 10, e.g. 250 -> 2.55, 2.
+  #
+  # @param number [Numeric]
+  #
+  # @return [Array<(Float, Integer)>] Coefficient (`+-[1, 10[`), exponent.
+  def split_number(number)
+    coefficient, exponent = Kernel.format("%e", number).split("e")
+
+    [coefficient.to_f, exponent.to_i]
+  end
+
+  def round_to_target(number, target, direction)
+    # REVIEW: What if exactly between two values? Sort and reverse target before
+    # comparing?
+    case direction
+    when 0
+      target.min_by { |t| (t - number).abs }
+    when -1
+      target.select { |t| t <= number }.max
+    when 1
+      target.select { |t| t >= number }.min
+    end
   end
 end

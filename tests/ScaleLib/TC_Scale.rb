@@ -2,6 +2,10 @@ require 'testup/testcase'
 require_relative '../../lib/scale'
 
 class TC_Scale < TestUp::TestCase
+  # Float tolerance used internally in SketchUp.
+  # From testup-2\src\testup\sketchup_test_utilities.rb
+  SKETCHUP_FLOAT_TOLERANCE = 1.0e-10
+
   def test_factor
     assert_equal(Scale.new("1:100").factor, 0.01)
     assert_equal(Scale.new("1%").factor, 0.01)
@@ -37,5 +41,33 @@ class TC_Scale < TestUp::TestCase
 
   def test_GreaterThan
     assert(Scale.new("1:100") > Scale.new("1:200"))
+  end
+
+  def test_ceil
+    scale1 = Scale.new("30%")
+    scale2 = scale1.ceil
+    assert_in_delta(scale1.factor, 0.3, SKETCHUP_FLOAT_TOLERANCE, "Original scale should not mutate")
+    assert_equal(scale2.factor, 0.5)
+  end
+
+  def test_ceil_Bang
+    scale1 = Scale.new("30%")
+    scale2 = scale1.ceil!
+    assert_same(scale1, scale2)
+    assert_equal(scale2.factor, 0.5)
+  end
+
+  def test_floor
+    scale1 = Scale.new("30%")
+    scale2 = scale1.floor
+    assert_in_delta(scale1.factor, 0.3, SKETCHUP_FLOAT_TOLERANCE, "Original scale should not mutate")
+    assert_equal(scale2.factor, 0.5)
+  end
+
+  def test_floor_Bang
+    scale1 = Scale.new("30%")
+    scale2 = scale1.floor!
+    assert_same(scale1, scale2)
+    assert_equal(scale2.factor, 0.5)
   end
 end
