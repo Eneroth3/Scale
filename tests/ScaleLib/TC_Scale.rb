@@ -48,6 +48,9 @@ class TC_Scale < TestUp::TestCase
     scale2 = scale1.ceil
     assert_in_delta(scale1.factor, 0.3, SKETCHUP_FLOAT_TOLERANCE, "Original scale should not mutate")
     assert_equal(scale2.factor, 0.5)
+
+    assert(Scale.new("1:25").ceil > Scale.new("1:25"))
+    assert(Scale.new("25").ceil > Scale.new("25"))
   end
 
   def test_ceil_Bang
@@ -62,6 +65,9 @@ class TC_Scale < TestUp::TestCase
     scale2 = scale1.floor
     assert_in_delta(scale1.factor, 0.3, SKETCHUP_FLOAT_TOLERANCE, "Original scale should not mutate")
     assert_equal(scale2.factor, 0.2)
+
+    assert(Scale.new("1:25").floor < Scale.new("1:25"))
+    assert(Scale.new("25").floor < Scale.new("25"))
   end
 
   def test_floor_Bang
