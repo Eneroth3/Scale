@@ -23,9 +23,37 @@ class TC_Scale < TestUp::TestCase
 
   def test_valid_Query
     assert(Scale.new(1).valid?)
+
     assert(Scale.new("1").valid?)
+    assert(Scale.new("1.1").valid?)
+    assert(Scale.new("1,1").valid?)
+    assert(Scale.new(".1").valid?)
+    assert(Scale.new("~1").valid?)
+
+    assert(Scale.new("1%").valid?)
+    assert(Scale.new("1.1%").valid?)
+    assert(Scale.new("1,1%").valid?)
+    assert(Scale.new(",1%").valid?)
+    assert(Scale.new("~1%").valid?)
+
+    assert(Scale.new("1:1").valid?)
+    assert(Scale.new("1:1.1").valid?)
+    assert(Scale.new("1:1,1").valid?)
+    assert(Scale.new("1.1:1").valid?)
+    assert(Scale.new("1,1:1").valid?)
+    assert(Scale.new("~1:1").valid?)
+
+    assert(Scale.new("1\"=4'").valid?)
+    assert(Scale.new("1\" = 4'").valid?)
+    assert(Scale.new("~1\" = 4'").valid?)
+
     refute(Scale.new("Hej").valid?)
+    refute(Scale.new("1%%").valid?)
+    refute(Scale.new("1:1%").valid?)
+    refute(Scale.new("1\":1'").valid?)
+    refute(Scale.new("1\"=1%").valid?)
     refute(Scale.new("0").valid?)
+    refute(Scale.new(0).valid?)
   end
 
   def test_Equal
