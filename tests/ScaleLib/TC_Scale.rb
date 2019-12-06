@@ -50,6 +50,7 @@ class TC_Scale < TestUp::TestCase
     refute(Scale.new("Hej").valid?)
     refute(Scale.new("1%%").valid?)
     refute(Scale.new("1:1%").valid?)
+    refute(Scale.new("1:").valid?)
     refute(Scale.new("1\":1'").valid?)
     refute(Scale.new("1\"=1%").valid?)
     refute(Scale.new("0").valid?)

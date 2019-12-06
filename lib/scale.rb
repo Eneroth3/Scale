@@ -186,7 +186,7 @@ class Scale
   #
   # @return [Boolean]
   def valid?
-    !!@factor && !@factor.zero?
+    !!@factor && !@factor.zero? && @factor.finite?
   end
 
   private
