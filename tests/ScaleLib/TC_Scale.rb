@@ -8,6 +8,7 @@ class TC_Scale < TestUp::TestCase
 
   def test_factor
     assert_equal(Scale.new("1:100").factor, 0.01)
+    assert_equal(Scale.new("1/100").factor, 0.01)
     assert_equal(Scale.new("1%").factor, 0.01)
     assert_equal(Scale.new("3\"=1'").factor, 1/4.0)
     assert_equal(Scale.new("3\" = 1'").factor, 1/4.0)
@@ -42,6 +43,13 @@ class TC_Scale < TestUp::TestCase
     assert(Scale.new("1.1:1").valid?)
     assert(Scale.new("1,1:1").valid?)
     assert(Scale.new("~1:1").valid?)
+
+    assert(Scale.new("1/1").valid?)
+    assert(Scale.new("1/1.1").valid?)
+    assert(Scale.new("1/1,1").valid?)
+    assert(Scale.new("1.1/1").valid?)
+    assert(Scale.new("1,1/1").valid?)
+    assert(Scale.new("~1/1").valid?)
 
     assert(Scale.new("1\"=4'").valid?)
     assert(Scale.new("1\" = 4'").valid?)
